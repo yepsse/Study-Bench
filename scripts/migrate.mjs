@@ -13,12 +13,17 @@
  * the same files at startup instead (see src/lib/db.ts).
  */
 import { readdir, readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
 import { pendingMigrations } from "./migration-plan.mjs";
 
-const databaseUrl = process.env.DATABASE_URL;
+const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+const localEnvPath = join(projectRoot, ".env.local");
+if (existsSync(localEnvPath)) process.loadEnvFile(localEnvPath);
+
+const databaseUrl = process.env.DATABASE_URL?.trim();
 if (!databaseUrl) {
   console.log(
     "[migrate] DATABASE_URL not set — skipping (the PGLite fallback migrates itself).",
@@ -26,7 +31,7 @@ if (!databaseUrl) {
   process.exit(0);
 }
 
-const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "migrations");
+const migrationsDir = join(projectRoot, "migrations");
 
 async function main() {
   let entries;

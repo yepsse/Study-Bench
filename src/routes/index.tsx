@@ -15,7 +15,7 @@ const ICONS: Record<SubjectId, typeof Bone> = {
 };
 
 function Home() {
-  const { ready, progress, reset } = useProgress();
+  const { ready, progress, reset, saveStatus, saveError, databaseLabel } = useProgress();
 
   return (
     <Shell>
@@ -24,6 +24,12 @@ function Home() {
         <p className="mt-3 text-muted">
           Study mode explains the idea and shows a worked example. Test mode hides the answers until you submit.
           Memorize mode is flip cards.
+        </p>
+        <p className="mt-3 text-sm text-muted" role="status" aria-live="polite">
+          {saveStatus === "loading" ? "Loading saved study data…" : null}
+          {saveStatus === "saving" ? "Saving study data…" : null}
+          {saveStatus === "saved" ? `Saved to ${databaseLabel}.` : null}
+          {saveStatus === "error" ? `Could not save to the database: ${saveError}` : null}
         </p>
       </section>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -66,7 +72,7 @@ function Home() {
       </div>
       <LearningLab />
       <p className="mt-8 text-sm text-muted">
-        Anatomy here skips the reproductive system. Progress stays in this browser.
+        Anatomy here skips the reproductive system. Study progress and spelling words are saved to the database.
       </p>
       <button
         type="button"
